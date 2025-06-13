@@ -1,18 +1,15 @@
 ==========================================
            FINBALANCE - README.txt
-           (Versión Beta 1.0)
+           (Versión Final 1)
 ==========================================
 
-📢 IMPORTANTE: 
-Funciones marcadas con [BETA] están en desarrollo 
-y pueden presentar comportamiento inesperado.
 
 🌟 INTRODUCCIÓN:
 FinBalance es tu aliado en gestión financiera personal. 
 Una aplicación web con:
 ✔️ Registro estable de gastos 
 ✔️ Visualización básica de reportes
-🛠️ [BETA] Módulos en desarrollo
+✔️ Configuraciones personalizadas
 
 🚀 CÓMO EMPEZAR:
 
@@ -21,7 +18,7 @@ Una aplicación web con:
 - Navegador moderno (Chrome/Firefox/Edge)
 
 2️⃣ INSTALACIÓN:
-1. Copiar la carpeta a: C:\xampp\htdocs\FinBalance
+1. Copiar el repositorio
 2. Importar DB: /backend/docs/finbalance_db.sql via phpMyAdmin
 3. Configurar /backend/db.php
 
@@ -31,33 +28,15 @@ Una aplicación web con:
 - Agregar gastos con categorías
 - Dashboard básico (gráfico de gastos)
 - Progreso de metas simple
-
-🛠️ [BETA] En desarrollo:
-- Configuración de perfil (no editable aún)
-- Listas filtradas de gastos (puede fallar)
+- Configuración de perfil
+- Listas filtradas de gastos
 - Detalles avanzados de metas
-- Exportación de reportes
 
 4️⃣ PRIMER USO:
 1. Iniciar XAMPP (Apache + MySQL)
 2. Navegar a: http://localhost/FinBalance/frontend/login.html
-
-5️⃣ LIMITACIONES CONOCIDAS:
-1. Dashboard:
-   - Filtros por fechas no funcionales
-   - Gráficos pueden no actualizarse en tiempo real
-
-2. Metas:
-   - No permite editar metas existentes
-   - Barra de progreso puede mostrar valores incorrectos
-
-3. Configuración:
-   - Página bajo construcción
+3. O simplmente entrar a la URL publica finbalance-production-744f.up.railway.app
 
 6️⃣ SOPORTE:
-Para reportar fallos en módulos [BETA]:
-soportefinbalance@gmail.com (Asunto: "Error BETA")
-
-==========================================
-© 2023 FinBalance - Versión Beta 1.0
-==========================================
+Para reportar fallos o modificaciones:
+josue.232.ziqn@gmail.com (Asunto: "Errores o recomendaciones")
