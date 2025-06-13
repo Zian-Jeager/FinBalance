@@ -7,17 +7,14 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-// Obtener datos del usuario incluyendo el presupuesto
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 
-// Obtener el presupuesto del usuario
 $stmt = $conn->prepare("SELECT budget FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user_data = $stmt->fetch(PDO::FETCH_ASSOC);
-$user_budget = $user_data['budget'] ?? 5000.00; // Valor por defecto si no existe
+$user_budget = $user_data['budget'] ?? 5000.00;
 
-// Obtener gastos del mes actual
 $current_month = date('Y-m');
 $stmt = $conn->prepare("
     SELECT category, SUM(amount) as total 
@@ -28,19 +25,15 @@ $stmt = $conn->prepare("
 $stmt->execute([$user_id, "$current_month%"]);
 $expenses_by_category = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
-// Calcular total de gastos del mes
 $total_expenses = array_sum(array_column($expenses_by_category, 'total'));
 
-// Calcular presupuesto restante
 $remaining_budget = $user_budget - $total_expenses;
 $budget_percentage = $user_budget > 0 ? min(($total_expenses / $user_budget) * 100, 100) : 0;
 
-// Obtener todas las metas
 $stmt = $conn->prepare("SELECT * FROM goals WHERE user_id = ? ORDER BY deadline ASC");
 $stmt->execute([$user_id]);
 $goals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Procesar actualización de metas (POST)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_goal'])) {
     $goal_id = $_POST['goal_id'];
     $amount = floatval($_POST['amount']);
@@ -52,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_goal'])) {
     exit();
 }
 
-// Determinar categoría principal de gastos
 $main_category = null;
 if (!empty($expenses_by_category)) {
     $main_category = array_reduce($expenses_by_category, 
@@ -74,7 +66,6 @@ if (!empty($expenses_by_category)) {
 </head>
 <body>
     <div class="dashboard">
-        <!-- Sidebar optimizado -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-wallet"></i>
@@ -90,7 +81,6 @@ if (!empty($expenses_by_category)) {
             </ul>
         </div>
 
-        <!-- Main Content mejorado -->
         <div class="main-content">
             <div class="header">
                 <div class="user-info">
@@ -105,7 +95,6 @@ if (!empty($expenses_by_category)) {
                 </a>
             </div>
 
-            <!-- Cards Resumen optimizadas -->
             <div class="cards-grid">
                 <div class="card">
                     <div class="card-header">
