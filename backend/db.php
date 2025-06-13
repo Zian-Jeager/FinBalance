@@ -1,9 +1,8 @@
 <?php
 // =============================================
-// CONEXIÓN SEGURA A LA BASE DE DATOS
+// CONEXIÓN A LA BASE DE DATOS :)
 // =============================================
 
-// Reemplaza con tus credenciales reales o usa variables de entorno
 $host = 'shinkansen.proxy.rlwy.net';
 $port = '55403';
 $dbname = 'railway';
@@ -16,8 +15,7 @@ try {
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
     ]);
 
-    // Conexión exitosa, no hacer nada
 } catch (PDOException $e) {
-    // Puedes loguear el error aquí si lo deseas
+
     die("Error al conectar con la BD.");
 }
