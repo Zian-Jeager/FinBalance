@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 
-// Obtener todas las metas del usuario
 $stmt = $conn->prepare("
     SELECT *, 
            (current_amount / target_amount * 100) as progress,
@@ -37,7 +36,6 @@ $goals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </head>
 <body>
     <div class="dashboard">
-        <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-wallet"></i>
