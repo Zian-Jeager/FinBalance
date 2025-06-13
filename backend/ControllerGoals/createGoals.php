@@ -13,9 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title']);
     $target_amount = floatval($_POST['target_amount']);
     $deadline = $_POST['deadline'];
-    $description = trim($_POST['description'] ?? ''); // Nueva línea para obtener la descripción
+    $description = trim($_POST['description'] ?? ''); 
     
-    // Validaciones
     if (empty($title)) {
         $error = "El título es obligatorio.";
     } elseif ($target_amount <= 0) {
@@ -34,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $title,
                 $target_amount,
                 $deadline,
-                $description // Incluir la descripción
+                $description
             ]);
             
             header("Location: ../dashboard.php?goal_added=1");
@@ -151,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="form-group">
-                <label for="description">Descripción (opcional)</label>
+                <label for="description">Descripción</label>
                 <textarea id="description" name="description" rows="3"></textarea>
             </div>
             
