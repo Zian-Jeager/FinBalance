@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $expense_id = $_GET['id'] ?? null;
 
-// Obtener información del gasto
 $stmt = $conn->prepare("SELECT * FROM expenses WHERE id = ? AND user_id = ?");
 $stmt->execute([$expense_id, $user_id]);
 $expense = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -21,14 +20,12 @@ if (!$expense) {
     exit();
 }
 
-// Procesar actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_expense'])) {
     $amount = floatval($_POST['amount']);
     $category = trim($_POST['category']);
     $description = trim($_POST['description'] ?? '');
     $date = $_POST['date'];
 
-    // Validaciones
     if ($amount <= 0 || empty($category)) {
         $_SESSION['error'] = "Por favor complete todos los campos requeridos correctamente";
     } else {
@@ -45,7 +42,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_expense'])) {
     }
 }
 
-// Obtener categorías disponibles
 $categories_stmt = $conn->prepare("SELECT DISTINCT category FROM expenses WHERE user_id = ? ORDER BY category");
 $categories_stmt->execute([$user_id]);
 $categories = $categories_stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -60,7 +56,6 @@ $categories = $categories_stmt->fetchAll(PDO::FETCH_COLUMN);
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Estilos similares a edit_goal.php */
         .container {
             max-width: 600px;
             margin: 20px auto;
