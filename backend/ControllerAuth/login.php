@@ -13,15 +13,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($user && password_verify($password, $user['password'])) {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['name'];
-        
-        // Mostrar alerta de éxito y redireccionar
+
         echo '<script type="text/javascript">
                 alert("Inicio de sesión exitoso. Bienvenido!");
                 window.location.href = "../dashboard.php";
               </script>';
         exit();
     } else {
-        // Mostrar alerta de error y regresar a la página de login
         echo '<script type="text/javascript">
                 alert("Credenciales incorrectas. Por favor intente nuevamente.");
                 window.location.href = "/FinBalance/FinBalance/frontend/login.html";
