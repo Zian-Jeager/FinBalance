@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Verificar si se recibió el ID del gasto a eliminar
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     $_SESSION['error'] = "ID de gasto no válido";
     header("Location: listExpenses.php");
@@ -19,7 +18,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 $expense_id = $_GET['id'];
 
 try {
-    // Verificar que el gasto pertenece al usuario actual
     $stmt = $conn->prepare("SELECT id FROM expenses WHERE id = ? AND user_id = ?");
     $stmt->execute([$expense_id, $user_id]);
     
@@ -29,7 +27,6 @@ try {
         exit();
     }
 
-    // Eliminar el gasto
     $stmt = $conn->prepare("DELETE FROM expenses WHERE id = ? AND user_id = ?");
     $stmt->execute([$expense_id, $user_id]);
     
