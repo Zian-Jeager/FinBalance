@@ -10,12 +10,10 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 
-// Obtener el mes seleccionado o usar el actual
 $selected_month = $_GET['month'] ?? date('Y-m');
 $prev_month = date('Y-m', strtotime($selected_month . ' -1 month'));
 $next_month = date('Y-m', strtotime($selected_month . ' +1 month'));
 
-// Obtener gastos del mes seleccionado
 $stmt = $conn->prepare("
     SELECT id, category, amount, description, DATE_FORMAT(date, '%d/%m/%Y') as formatted_date, date 
     FROM expenses 
@@ -25,7 +23,6 @@ $stmt = $conn->prepare("
 $stmt->execute([$user_id, "$selected_month%"]);
 $expenses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Calcular total del mes
 $total_month = array_sum(array_column($expenses, 'amount'));
 ?>
 
@@ -137,7 +134,6 @@ $total_month = array_sum(array_column($expenses, 'amount'));
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
     <script>
-        // Configurar el selector de mes
         flatpickr("#monthPicker", {
             locale: "es",
             dateFormat: "Y-m",
