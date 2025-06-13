@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = trim($_POST['description']);
     $date = $_POST['date'];
 
-    // Validaciones
     if ($amount <= 0) {
         $error = "El monto debe ser mayor a cero.";
     } elseif (!in_array($category, $categories)) {
@@ -24,7 +23,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (empty($date)) {
         $error = "La fecha es obligatoria.";
     } else {
-        // Insertar en la DB
         try {
             $stmt = $conn->prepare("
                 INSERT INTO expenses (user_id, amount, category, description, date)
@@ -49,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Agregar Gasto | FinBalance</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        /* Estilos consistentes con el dashboard */
         :root {
             --primary: #3498db;
             --dark: #2c3e50;
