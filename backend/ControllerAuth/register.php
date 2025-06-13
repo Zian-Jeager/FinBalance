@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$name, $email, $hashed_password]);
             
             if ($stmt->rowCount() > 0) {
-                echo '<script>alert("¡Registro exitoso! Su cuenta ha sido creada correctamente. Será redirigido al panel de control."); window.location.href = "../dashboard.php";</script>';
+                echo '<script>alert("¡Registro exitoso! Su cuenta ha sido creada correctamente. Será redirigido al inicio de sesion."); window.location.href = "../dashboard.php";</script>';
             } else {
                 echo '<script>alert("Error: No se pudo completar el registro. Por favor intente nuevamente."); window.history.back();</script>';
             }
