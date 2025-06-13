@@ -9,12 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// Obtener información del usuario
 $stmt = $conn->prepare("SELECT name, created_at, budget FROM users WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Mensajes motivacionales aleatorios
 $motivational_messages = [
     "Cada pequeño ahorro te acerca a tus grandes sueños. ¡Sigue así!",
     "El control financiero es el primer paso hacia la libertad. ¡Buen trabajo!",
@@ -26,7 +24,6 @@ $motivational_messages = [
 
 $random_message = $motivational_messages[array_rand($motivational_messages)];
 
-// Procesar cambio de nombre de usuario
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_username'])) {
     $new_username = trim($_POST['username']);
     
@@ -43,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_username'])) {
     }
 }
 
-// Procesar actualización de presupuesto
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_budget'])) {
     $new_budget = floatval($_POST['budget']);
     
@@ -133,8 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_budget'])) {
                         </button>
                     </form>
                 </div>
-                
-                <!-- Sección de configuración de presupuesto -->
+
                 <div class="profile-section">
                     <h3 class="section-title">
                         <i class="fas fa-wallet"></i>
