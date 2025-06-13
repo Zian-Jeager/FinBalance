@@ -10,7 +10,6 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $goal_id = $_GET['id'] ?? null;
 
-// Obtener información de la meta
 $stmt = $conn->prepare("SELECT * FROM goals WHERE id = ? AND user_id = ?");
 $stmt->execute([$goal_id, $user_id]);
 $goal = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -21,7 +20,6 @@ if (!$goal) {
     exit();
 }
 
-// Procesar actualización
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_goal'])) {
     $title = trim($_POST['title']);
     $target_amount = floatval($_POST['target_amount']);
@@ -29,7 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_goal'])) {
     $deadline = $_POST['deadline'];
     $description = trim($_POST['description'] ?? '');
 
-    // Validaciones
     if (empty($title) || $target_amount <= 0 || $current_amount < 0) {
         $_SESSION['error'] = "Por favor complete todos los campos requeridos correctamente";
     } else {
@@ -57,7 +54,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_goal'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../frontend/StylesCSS/DashboardStyle.css">
     <style>
-        /* Estilos similares a los de profile.php */
         .container {
             max-width: 600px;
             margin: 20px auto;
