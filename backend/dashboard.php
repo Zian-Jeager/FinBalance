@@ -63,8 +63,472 @@ if (!empty($expenses_by_category)) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../frontend/StylesCSS/DashboardStyle.css">
+<style>
+        :root {
+            --primary: #3498db;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar mejorado */
+        .sidebar {
+            background: var(--dark);
+            color: white;
+            padding: 15px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            margin-left: 10px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu a {
+            color: var(--light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        /* Main Content optimizado */
+        .main-content {
+            padding: 25px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* Cards más compactas */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .card-title {
+            font-size: 1rem;
+            color: var(--dark);
+        }
+        
+        .card-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 8px 0;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            margin-top: 12px;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Secciones mejoradas */
+        .section-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        /* Gráfico optimizado */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            max-width: 700px;
+            margin: 15px auto;
+        }
+
+        #expensesChart {
+            display: block;
+            width: 100% !important;
+            height: 100% !important;
+        }
+
+        /* Metas mejoradas */
+        .goal-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .goal-info {
+            flex: 1;
+        }
+        
+        .goal-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+        
+        .goal-deadline {
+            font-size: 0.75rem;
+            color: #7f8c8d;
+        }
+        
+        .goal-form {
+            display: flex;
+            align-items: center;
+        }
+        
+        .goal-form input {
+            width: 90px;
+            padding: 7px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .update-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .update-btn:hover {
+            background: #27ae60;
+        }
+        
+        /* Estado vacío */
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        .empty-state p {
+            margin-bottom: 15px;
+        }
+
+        .card-value[style*="var(--success)"] {
+            color: var(--success) !important;
+        }
+
+        .card-value[style*="var(--danger)"] {
+            color: var(--danger) !important;
+        }
+
+        .fa-piggy-bank {
+            color: #ff6b6b;
+        }
+
+        /* ===== MEDIA QUERIES PARA DISPOSITIVOS MÓVILES ===== */
+
+        /* Tabletas y dispositivos medianos (768px o menos) */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr !important;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -250px;
+                width: 220px;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                padding-top: 50px;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .menu-toggle {
+                display: block !important;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1001;
+                background: var(--dark);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+            }
+            
+            .main-content {
+                padding: 70px 15px 25px 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+        }
+
+        /* Dispositivos móviles pequeños (480px o menos) */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 65px 10px 20px 10px;
+            }
+            
+            .card {
+                padding: 12px;
+            }
+            
+            .card-value {
+                font-size: 1.4rem;
+            }
+            
+            .section-container {
+                padding: 15px;
+            }
+            
+            .goal-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .goal-form {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .goal-form input {
+                flex: 1;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+            
+            .logout-btn {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+            }
+        }
+
+        /* Elementos adicionales necesarios para el menú móvil */
+        .menu-toggle {
+            display: none;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Mejoras generales para móviles */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .sidebar-header {
+                margin-bottom: 20px;
+            }
+            
+            .logout-btn {
+                padding: 8px 15px;
+            }
+            
+            /* Asegurar que las imágenes y gráficos sean responsivos */
+            canvas {
+                max-width: 100% !important;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Botón de menú móvil y overlay -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i> Menú
+    </button>
+    
+    <div class="overlay" id="overlay"></div>
+
     <div class="dashboard">
         <div class="sidebar">
             <div class="sidebar-header">
@@ -84,10 +548,10 @@ if (!empty($expenses_by_category)) {
         <div class="main-content">
             <div class="header">
                 <div class="user-info">
-                    <div class="user-avatar"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
+                    <div class="user-avatar">U</div>
                     <div>
-                        <div style="font-weight: 600;"><?= htmlspecialchars($user_name) ?></div>
-                        <div style="font-size: 0.75rem; color: #777;"><?= date('d M Y') ?></div>
+                        <div style="font-weight: 600;">Usuario Ejemplo</div>
+                        <div style="font-size: 0.75rem; color: #777;">15 Nov 2023</div>
                     </div>
                 </div>
                 <a href="ControllerAuth/logout.php" class="logout-btn">
@@ -102,15 +566,15 @@ if (!empty($expenses_by_category)) {
                         <i class="fas fa-wallet card-icon"></i>
                     </div>
                     <div class="card-value">
-                        $<?= number_format($total_expenses, 2) ?>
+                        $1,250.75
                     </div>
                     <div class="progress-container">
                         <div class="progress-info">
-                            <span>Presupuesto: $<?= number_format($user_budget, 2) ?></span>
-                            <span><?= round($budget_percentage) ?>%</span>
+                            <span>Presupuesto: $2,000.00</span>
+                            <span>63%</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress" style="width: <?= $budget_percentage ?>%"></div>
+                            <div class="progress" style="width: 63%"></div>
                         </div>
                     </div>
                 </div>
@@ -120,11 +584,11 @@ if (!empty($expenses_by_category)) {
                         <span class="card-title">Presupuesto restante</span>
                         <i class="fas fa-piggy-bank card-icon"></i>
                     </div>
-                    <div class="card-value" style="color: <?= $remaining_budget >= 0 ? 'var(--success)' : 'var(--danger)' ?>">
-                        $<?= number_format($remaining_budget, 2) ?>
+                    <div class="card-value" style="color: var(--success)">
+                        $749.25
                     </div>
                     <div class="progress-info">
-                        <span>Días restantes: <?= date('t') - date('j') ?></span>
+                        <span>Días restantes: 15</span>
                     </div>
                 </div>
 
@@ -133,9 +597,9 @@ if (!empty($expenses_by_category)) {
                         <span class="card-title">Metas activas</span>
                         <i class="fas fa-bullseye card-icon"></i>
                     </div>
-                    <div class="card-value"><?= count($goals) ?></div>
+                    <div class="card-value">3</div>
                     <div class="progress-info">
-                        <span>Completadas: <?= count(array_filter($goals, fn($g) => $g['current_amount'] >= $g['target_amount'])) ?></span>
+                        <span>Completadas: 1</span>
                     </div>
                 </div>
 
@@ -144,17 +608,10 @@ if (!empty($expenses_by_category)) {
                         <span class="card-title">Categoría principal</span>
                         <i class="fas fa-tag card-icon"></i>
                     </div>
-                    <?php if ($main_category): ?>
-                        <div class="card-value"><?= htmlspecialchars($main_category['category']) ?></div>
-                        <div class="progress-info">
-                            <span>Gastado: $<?= number_format($main_category['total'], 2) ?></span>
-                        </div>
-                    <?php else: ?>
-                        <div class="card-value">N/A</div>
-                        <div class="progress-info">
-                            <span>No hay gastos registrados</span>
-                        </div>
-                    <?php endif; ?>
+                    <div class="card-value">Comida</div>
+                    <div class="progress-info">
+                        <span>Gastado: $450.50</span>
+                    </div>
                 </div>
             </div>
 
@@ -164,14 +621,7 @@ if (!empty($expenses_by_category)) {
                     Distribución de Gastos
                 </h3>
                 <div class="chart-container">
-                    <?php if (!empty($expenses_by_category)): ?>
-                        <canvas id="expensesChart"></canvas>
-                    <?php else: ?>
-                        <div class="empty-state">
-                            <i class="fas fa-chart-pie"></i>
-                            <p>No hay datos de gastos para mostrar</p>
-                        </div>
-                    <?php endif; ?>
+                    <canvas id="expensesChart"></canvas>
                 </div>
             </div>
 
@@ -181,91 +631,108 @@ if (!empty($expenses_by_category)) {
                     Tus Metas Financieras
                 </h3>
                 
-                <?php if (!empty($goals)): ?>
-                    <?php foreach ($goals as $goal): 
-                        $progress = ($goal['current_amount'] / $goal['target_amount']) * 100;
-                        $is_complete = $goal['current_amount'] >= $goal['target_amount'];
-                    ?>
-                        <div class="goal-item">
-                            <div class="goal-info">
-                                <div class="goal-title">
-                                    <?= htmlspecialchars($goal['title']) ?>
-                                    <?php if ($is_complete): ?>
-                                        <span style="color: var(--success); font-size: 0.75rem; margin-left: 6px;">
-                                            <i class="fas fa-check-circle"></i> Completada
-                                        </span>
-                                    <?php endif; ?>
-                                </div>
-                                <div class="goal-deadline">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    Meta: $<?= number_format($goal['target_amount'], 2) ?> • 
-                                    Fecha límite: <?= date('d/m/Y', strtotime($goal['deadline'])) ?>
-                                </div>
-                                <div class="progress-container" style="margin-top: 8px;">
-                                    <div class="progress-info">
-                                        <span>$<?= number_format($goal['current_amount'], 2) ?> de $<?= number_format($goal['target_amount'], 2) ?></span>
-                                        <span><?= round($progress) ?>%</span>
-                                    </div>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: <?= min($progress, 100) ?>%; background: <?= $is_complete ? 'var(--success)' : 'var(--primary)' ?>;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <?php if (!$is_complete): ?>
-                                <form method="POST" class="goal-form">
-                                    <input type="hidden" name="goal_id" value="<?= $goal['id'] ?>">
-                                    <input type="number" name="amount" step="0.01" min="0" max="<?= $goal['target_amount'] ?>" 
-                                           value="<?= $goal['current_amount'] ?>" required>
-                                    <button type="submit" name="update_goal" class="update-btn">
-                                        <i class="fas fa-sync-alt"></i> Actualizar
-                                    </button>
-                                </form>
-                            <?php endif; ?>
+                <div class="goal-item">
+                    <div class="goal-info">
+                        <div class="goal-title">
+                            Ahorro para vacaciones
+                            <span style="color: var(--success); font-size: 0.75rem; margin-left: 6px;">
+                                <i class="fas fa-check-circle"></i> Completada
+                            </span>
                         </div>
-                    <?php endforeach; ?>
-                <?php else: ?>
-                    <div class="empty-state">
-                        <i class="fas fa-bullseye"></i>
-                        <p>No tienes metas financieras registradas</p>
-                        <a href="ControllerGoals/createGoals.php" style="display: inline-block; margin-top: 12px; background: var(--primary); color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">
-                            <i class="fas fa-plus"></i> Crear mi primera meta
-                        </a>
+                        <div class="goal-deadline">
+                            <i class="fas fa-calendar-alt"></i>
+                            Meta: $2,000.00 • 
+                            Fecha límite: 30/11/2023
+                        </div>
+                        <div class="progress-container" style="margin-top: 8px;">
+                            <div class="progress-info">
+                                <span>$2,000.00 de $2,000.00</span>
+                                <span>100%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 100%; background: var(--success);"></div>
+                            </div>
+                        </div>
                     </div>
-                <?php endif; ?>
+                </div>
+                
+                <div class="goal-item">
+                    <div class="goal-info">
+                        <div class="goal-title">
+                            Nuevo portátil
+                        </div>
+                        <div class="goal-deadline">
+                            <i class="fas fa-calendar-alt"></i>
+                            Meta: $1,200.00 • 
+                            Fecha límite: 15/12/2023
+                        </div>
+                        <div class="progress-container" style="margin-top: 8px;">
+                            <div class="progress-info">
+                                <span>$650.00 de $1,200.00</span>
+                                <span>54%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 54%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <form method="POST" class="goal-form">
+                        <input type="hidden" name="goal_id" value="2">
+                        <input type="number" name="amount" step="0.01" min="0" max="1200" value="650" required>
+                        <button type="submit" name="update_goal" class="update-btn">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    
-    <?php if (!empty($expenses_by_category)): ?>
+
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const ctx = document.getElementById('expensesChart').getContext('2d');
-        window.expensesChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: <?= json_encode(array_column($expenses_by_category, 'category')) ?>,
-                datasets: [{
-                    data: <?= json_encode(array_column($expenses_by_category, 'total')) ?>,
-                    backgroundColor: [
-                        '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6',
-                        '#1abc9c', '#d35400', '#34495e', '#7f8c8d', '#27ae60'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right'
-                    }
-                },
-                cutout: '65%'
+        // JavaScript para el funcionamiento del menú móvil
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                });
+                
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
             }
+
+            // Configuración del gráfico con Chart.js v3.9.1
+            const ctx = document.getElementById('expensesChart').getContext('2d');
+            const expensesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Comida', 'Transporte', 'Entretenimiento', 'Servicios', 'Otros'],
+                    datasets: [{
+                        data: [450.50, 220.25, 180.00, 300.00, 100.00],
+                        backgroundColor: [
+                            '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
         });
-    });
     </script>
-    <?php endif; ?>
 </body>
 </html>
