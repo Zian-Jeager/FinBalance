@@ -32,9 +32,489 @@ $goals = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <title>Mis Metas | FinBalance</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="/frontend/StylesCSS/GoalsStyle.css">
+    <style>
+        :root {
+            --primary: #3498db;
+            --dark: #2c3e50;
+            --light: #ecf0f1;
+            --success: #2ecc71;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            background: var(--dark);
+            color: white;
+            padding: 15px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.1rem;
+            margin-left: 10px;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 10px;
+        }
+        
+        .sidebar-menu a {
+            color: var(--light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 25px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 7px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* Goals Container */
+        .goals-container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+        }
+        
+        /* Goal Filter */
+        .goal-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            background: #f5f5f5;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn:hover {
+            background: #e0e0e0;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Goal Cards */
+        .goal-card {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .goal-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        
+        .goal-card.completed {
+            border-left: 4px solid var(--success);
+        }
+        
+        .goal-card:not(.completed) {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .goal-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+        
+        .goal-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            background: #e8f5e9;
+            color: var(--success);
+        }
+        
+        .status-pending {
+            background: #e3f2fd;
+            color: var(--primary);
+        }
+        
+        .goal-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .goal-deadline {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+        
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 15px;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        /* Goal Actions */
+        .goal-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .goal-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .edit-btn {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .edit-btn:hover {
+            background: #2980b9;
+        }
+        
+        .delete-btn {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+        
+        /* No Goals State */
+        .no-goals {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+        }
+        
+        .no-goals i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        .no-goals p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .add-goal-btn {
+            display: inline-block;
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+        
+        .add-goal-btn:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        /* ===== MEDIA QUERIES RESPONSIVE ===== */
+        /* Tabletas y dispositivos medianos (768px o menos) */
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr !important;
+                grid-template-rows: auto 1fr;
+            }
+            
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: -250px;
+                width: 220px;
+                height: 100vh;
+                z-index: 1000;
+                transition: left 0.3s ease;
+                padding-top: 50px;
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .menu-toggle {
+                display: block !important;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1001;
+                background: var(--dark);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+            }
+            
+            .main-content {
+                padding: 70px 15px 25px 15px;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .goal-filter {
+                justify-content: center;
+            }
+            
+            .goal-details {
+                flex-direction: column;
+            }
+            
+            .goal-actions {
+                flex-direction: column;
+            }
+            
+            .goal-btn {
+                justify-content: center;
+            }
+        }
+
+        /* Dispositivos móviles pequeños (480px o menos) */
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 65px 10px 20px 10px;
+            }
+            
+            .goals-container {
+                padding: 15px;
+            }
+            
+            .goal-card {
+                padding: 15px;
+            }
+            
+            .goal-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .filter-btn {
+                padding: 8px 12px;
+                font-size: 0.8rem;
+            }
+            
+            .logout-btn {
+                width: 100%;
+                text-align: center;
+                padding: 10px;
+            }
+        }
+
+        /* Elementos adicionales necesarios para el menú móvil */
+        .menu-toggle {
+            display: none;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Mejoras generales para móviles */
+        @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+            }
+            
+            .sidebar-header {
+                margin-bottom: 20px;
+            }
+            
+            .logout-btn {
+                padding: 8px 15px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Botón de menú móvil y overlay -->
+    <button class="menu-toggle" id="menuToggle">
+        <i class="fas fa-bars"></i> Menú
+    </button>
+    
+    <div class="overlay" id="overlay"></div>
+
     <div class="dashboard">
         <div class="sidebar">
             <div class="sidebar-header">
@@ -138,6 +618,26 @@ $goals = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 
     <script>
+        // JavaScript para el funcionamiento del menú móvil
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            if (menuToggle && sidebar) {
+                menuToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                    overlay.classList.toggle('active');
+                });
+                
+                overlay.addEventListener('click', function() {
+                    sidebar.classList.remove('active');
+                    overlay.classList.remove('active');
+                });
+            }
+        });
+        
+        // Funciones originales de filtrado y acciones
         document.querySelectorAll('.filter-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
