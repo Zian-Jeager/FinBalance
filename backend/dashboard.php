@@ -63,7 +63,7 @@ if (!empty($expenses_by_category)) {
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="../frontend/StylesCSS/DashboardStyle.css">
-<style>
+    <style>
         :root {
             --primary: #3498db;
             --dark: #2c3e50;
@@ -548,10 +548,10 @@ if (!empty($expenses_by_category)) {
         <div class="main-content">
             <div class="header">
                 <div class="user-info">
-                    <div class="user-avatar">U</div>
+                    <div class="user-avatar"><?= strtoupper(substr($user_name, 0, 1)) ?></div>
                     <div>
-                        <div style="font-weight: 600;">Usuario Ejemplo</div>
-                        <div style="font-size: 0.75rem; color: #777;">15 Nov 2023</div>
+                        <div style="font-weight: 600;"><?= htmlspecialchars($user_name) ?></div>
+                        <div style="font-size: 0.75rem; color: #777;"><?= date('d M Y') ?></div>
                     </div>
                 </div>
                 <a href="ControllerAuth/logout.php" class="logout-btn">
@@ -566,15 +566,15 @@ if (!empty($expenses_by_category)) {
                         <i class="fas fa-wallet card-icon"></i>
                     </div>
                     <div class="card-value">
-                        $1,250.75
+                        $<?= number_format($total_expenses, 2) ?>
                     </div>
                     <div class="progress-container">
                         <div class="progress-info">
-                            <span>Presupuesto: $2,000.00</span>
-                            <span>63%</span>
+                            <span>Presupuesto: $<?= number_format($user_budget, 2) ?></span>
+                            <span><?= round($budget_percentage) ?>%</span>
                         </div>
                         <div class="progress-bar">
-                            <div class="progress" style="width: 63%"></div>
+                            <div class="progress" style="width: <?= $budget_percentage ?>%"></div>
                         </div>
                     </div>
                 </div>
@@ -584,11 +584,11 @@ if (!empty($expenses_by_category)) {
                         <span class="card-title">Presupuesto restante</span>
                         <i class="fas fa-piggy-bank card-icon"></i>
                     </div>
-                    <div class="card-value" style="color: var(--success)">
-                        $749.25
+                    <div class="card-value" style="color: <?= $remaining_budget >= 0 ? 'var(--success)' : 'var(--danger)' ?>">
+                        $<?= number_format($remaining_budget, 2) ?>
                     </div>
                     <div class="progress-info">
-                        <span>Días restantes: 15</span>
+                        <span>Días restantes: <?= date('t') - date('j') ?></span>
                     </div>
                 </div>
 
@@ -597,9 +597,9 @@ if (!empty($expenses_by_category)) {
                         <span class="card-title">Metas activas</span>
                         <i class="fas fa-bullseye card-icon"></i>
                     </div>
-                    <div class="card-value">3</div>
+                    <div class="card-value"><?= count($goals) ?></div>
                     <div class="progress-info">
-                        <span>Completadas: 1</span>
+                        <span>Completadas: <?= count(array_filter($goals, fn($g) => $g['current_amount'] >= $g['target_amount'])) ?></span>
                     </div>
                 </div>
 
@@ -608,10 +608,17 @@ if (!empty($expenses_by_category)) {
                         <span class="card-title">Categoría principal</span>
                         <i class="fas fa-tag card-icon"></i>
                     </div>
-                    <div class="card-value">Comida</div>
-                    <div class="progress-info">
-                        <span>Gastado: $450.50</span>
-                    </div>
+                    <?php if ($main_category): ?>
+                        <div class="card-value"><?= htmlspecialchars($main_category['category']) ?></div>
+                        <div class="progress-info">
+                            <span>Gastado: $<?= number_format($main_category['total'], 2) ?></span>
+                        </div>
+                    <?php else: ?>
+                        <div class="card-value">N/A</div>
+                        <div class="progress-info">
+                            <span>No hay gastos registrados</span>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -621,7 +628,14 @@ if (!empty($expenses_by_category)) {
                     Distribución de Gastos
                 </h3>
                 <div class="chart-container">
-                    <canvas id="expensesChart"></canvas>
+                    <?php if (!empty($expenses_by_category)): ?>
+                        <canvas id="expensesChart"></canvas>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <i class="fas fa-chart-pie"></i>
+                            <p>No hay datos de gastos para mostrar</p>
+                        </div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -631,62 +645,92 @@ if (!empty($expenses_by_category)) {
                     Tus Metas Financieras
                 </h3>
                 
-                <div class="goal-item">
-                    <div class="goal-info">
-                        <div class="goal-title">
-                            Ahorro para vacaciones
-                            <span style="color: var(--success); font-size: 0.75rem; margin-left: 6px;">
-                                <i class="fas fa-check-circle"></i> Completada
-                            </span>
-                        </div>
-                        <div class="goal-deadline">
-                            <i class="fas fa-calendar-alt"></i>
-                            Meta: $2,000.00 • 
-                            Fecha límite: 30/11/2023
-                        </div>
-                        <div class="progress-container" style="margin-top: 8px;">
-                            <div class="progress-info">
-                                <span>$2,000.00 de $2,000.00</span>
-                                <span>100%</span>
+                <?php if (!empty($goals)): ?>
+                    <?php foreach ($goals as $goal): 
+                        $progress = ($goal['current_amount'] / $goal['target_amount']) * 100;
+                        $is_complete = $goal['current_amount'] >= $goal['target_amount'];
+                    ?>
+                        <div class="goal-item">
+                            <div class="goal-info">
+                                <div class="goal-title">
+                                    <?= htmlspecialchars($goal['title']) ?>
+                                    <?php if ($is_complete): ?>
+                                        <span style="color: var(--success); font-size: 0.75rem; margin-left: 6px;">
+                                            <i class="fas fa-check-circle"></i> Completada
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="goal-deadline">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Meta: $<?= number_format($goal['target_amount'], 2) ?> • 
+                                    Fecha límite: <?= date('d/m/Y', strtotime($goal['deadline'])) ?>
+                                </div>
+                                <div class="progress-container" style="margin-top: 8px;">
+                                    <div class="progress-info">
+                                        <span>$<?= number_format($goal['current_amount'], 2) ?> de $<?= number_format($goal['target_amount'], 2) ?></span>
+                                        <span><?= round($progress) ?>%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: <?= min($progress, 100) ?>%; background: <?= $is_complete ? 'var(--success)' : 'var(--primary)' ?>;"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 100%; background: var(--success);"></div>
-                            </div>
+                            <?php if (!$is_complete): ?>
+                                <form method="POST" class="goal-form">
+                                    <input type="hidden" name="goal_id" value="<?= $goal['id'] ?>">
+                                    <input type="number" name="amount" step="0.01" min="0" max="<?= $goal['target_amount'] ?>" 
+                                           value="<?= $goal['current_amount'] ?>" required>
+                                    <button type="submit" name="update_goal" class="update-btn">
+                                        <i class="fas fa-sync-alt"></i> Actualizar
+                                    </button>
+                                </form>
+                            <?php endif; ?>
                         </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="empty-state">
+                        <i class="fas fa-bullseye"></i>
+                        <p>No tienes metas financieras registradas</p>
+                        <a href="ControllerGoals/createGoals.php" style="display: inline-block; margin-top: 12px; background: var(--primary); color: white; padding: 8px 15px; border-radius: 4px; text-decoration: none; font-size: 0.9rem;">
+                            <i class="fas fa-plus"></i> Crear mi primera meta
+                        </a>
                     </div>
-                </div>
-                
-                <div class="goal-item">
-                    <div class="goal-info">
-                        <div class="goal-title">
-                            Nuevo portátil
-                        </div>
-                        <div class="goal-deadline">
-                            <i class="fas fa-calendar-alt"></i>
-                            Meta: $1,200.00 • 
-                            Fecha límite: 15/12/2023
-                        </div>
-                        <div class="progress-container" style="margin-top: 8px;">
-                            <div class="progress-info">
-                                <span>$650.00 de $1,200.00</span>
-                                <span>54%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress" style="width: 54%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <form method="POST" class="goal-form">
-                        <input type="hidden" name="goal_id" value="2">
-                        <input type="number" name="amount" step="0.01" min="0" max="1200" value="650" required>
-                        <button type="submit" name="update_goal" class="update-btn">
-                            <i class="fas fa-sync-alt"></i> Actualizar
-                        </button>
-                    </form>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
+    
+    <?php if (!empty($expenses_by_category)): ?>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('expensesChart').getContext('2d');
+        window.expensesChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: <?= json_encode(array_column($expenses_by_category, 'category')) ?>,
+                datasets: [{
+                    data: <?= json_encode(array_column($expenses_by_category, 'total')) ?>,
+                    backgroundColor: [
+                        '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6',
+                        '#1abc9c', '#d35400', '#34495e', '#7f8c8d', '#27ae60'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right'
+                    }
+                },
+                cutout: '65%'
+            }
+        });
+    });
+    </script>
+    <?php endif; ?>
 
     <script>
         // JavaScript para el funcionamiento del menú móvil
@@ -706,32 +750,6 @@ if (!empty($expenses_by_category)) {
                     overlay.classList.remove('active');
                 });
             }
-
-            // Configuración del gráfico con Chart.js v3.9.1
-            const ctx = document.getElementById('expensesChart').getContext('2d');
-            const expensesChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Comida', 'Transporte', 'Entretenimiento', 'Servicios', 'Otros'],
-                    datasets: [{
-                        data: [450.50, 220.25, 180.00, 300.00, 100.00],
-                        backgroundColor: [
-                            '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right'
-                        }
-                    },
-                    cutout: '65%'
-                }
-            });
         });
     </script>
 </body>
