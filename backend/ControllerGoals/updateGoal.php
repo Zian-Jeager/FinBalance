@@ -92,8 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_goal'])) {
     </style>
 </head>
 <body>
-    <?php
-    
     <div class="container">
         <h2><i class="fas fa-edit"></i> Editar Meta</h2>
         
@@ -137,5 +135,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_goal'])) {
     </div>
 </body>
 </html>
+
 
 
