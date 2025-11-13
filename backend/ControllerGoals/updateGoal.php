@@ -105,10 +105,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_goal'])) {
             <button type="submit" name="update_goal" class="btn">
                 <i class="fas fa-save"></i> Guardar Cambios
             </button>
-            <a href="goals.php" class="btn" style="background: #6c757d;">
+            <a href="listGoals.php" class="btn" style="background: #6c757d;">
                 <i class="fas fa-times"></i> Cancelar
             </a>
         </form>
     </div>
 </body>
 </html>
+
